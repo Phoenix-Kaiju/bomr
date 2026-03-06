@@ -1,53 +1,106 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
+import type { ThemePreset } from '@/data/app-settings';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const brandInk = '#E6E8EC';
+const brandSand = '#0B0D10';
+const brandClay = '#2FE6C8';
+const brandMoss = '#29B38F';
+const brandSteel = '#90A0B5';
+const brandMist = '#171B22';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: brandInk,
+    background: brandSand,
+    tint: brandClay,
+    accent: brandMoss,
+    muted: '#8D97A8',
+    surface: '#131820',
+    surfaceAlt: brandMist,
+    border: '#1F2530',
+    icon: brandSteel,
+    tabIconDefault: '#657184',
+    tabIconSelected: brandClay,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: brandInk,
+    background: brandSand,
+    tint: brandClay,
+    accent: brandMoss,
+    muted: '#6E6A63',
+    surface: '#FFFBF5',
+    surfaceAlt: brandMist,
+    border: '#DED5C6',
+    icon: brandSteel,
+    tabIconDefault: '#8C867C',
+    tabIconSelected: brandClay,
   },
 };
 
+const THEME_OVERRIDES: Record<ThemePreset, Partial<typeof Colors.light>> = {
+  NEON: {},
+  SLATE: {
+    background: '#10141B',
+    surface: '#161C26',
+    surfaceAlt: '#1B2431',
+    border: '#263142',
+    tint: '#A8B5C7',
+    accent: '#8EA0B8',
+    muted: '#97A3B2',
+  },
+  FOREST: {
+    background: '#0D1310',
+    surface: '#151E18',
+    surfaceAlt: '#1B271F',
+    border: '#233429',
+    tint: '#58C58D',
+    accent: '#3FB476',
+    muted: '#8EA69A',
+  },
+  AMBER: {
+    background: '#14100B',
+    surface: '#1C1510',
+    surfaceAlt: '#251C14',
+    border: '#30231A',
+    tint: '#F0A13A',
+    accent: '#E48A20',
+    muted: '#B99A73',
+  },
+  MONO: {
+    background: '#0E1012',
+    surface: '#171A1E',
+    surfaceAlt: '#1C2026',
+    border: '#252A33',
+    tint: '#D0D4DA',
+    accent: '#B8C0CA',
+    muted: '#9DA5B0',
+  },
+};
+
+export const getThemePalette = (preset: ThemePreset) => ({
+  ...Colors.light,
+  ...THEME_OVERRIDES[preset],
+});
+
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+    display: 'Avenir Next',
+    body: 'Avenir Next',
+    mono: 'Menlo',
+  },
+  android: {
+    display: 'serif',
+    body: 'serif',
+    mono: 'monospace',
   },
   default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
+    display: 'serif',
+    body: 'serif',
     mono: 'monospace',
   },
   web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
+    display: "'Avenir Next', 'Avenir', 'Helvetica Neue', Helvetica, Arial, serif",
+    body: "'Avenir Next', 'Avenir', 'Helvetica Neue', Helvetica, Arial, serif",
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
