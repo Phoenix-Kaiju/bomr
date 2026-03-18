@@ -5,7 +5,7 @@ import { View } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { INITIAL_TAB_ROUTE, TAB_ROUTE_ORDER, type TabRoute } from '@/constants/navigation';
+import { getTabHref, INITIAL_TAB_ROUTE, TAB_ROUTE_ORDER, type TabRoute } from '@/constants/navigation';
 import { getThemePalette } from '@/constants/theme';
 import { useAppSettings } from '@/data/app-settings';
 
@@ -28,10 +28,10 @@ export default function TabLayout() {
       }
       if (event.translationX <= -45) {
         const nextIndex = (currentIndex + 1) % TAB_ROUTE_ORDER.length;
-        router.navigate(`/(tabs)/${TAB_ROUTE_ORDER[nextIndex]}` as never);
+        router.navigate(getTabHref(TAB_ROUTE_ORDER[nextIndex]) as never);
       } else if (event.translationX >= 45) {
         const prevIndex = (currentIndex - 1 + TAB_ROUTE_ORDER.length) % TAB_ROUTE_ORDER.length;
-        router.navigate(`/(tabs)/${TAB_ROUTE_ORDER[prevIndex]}` as never);
+        router.navigate(getTabHref(TAB_ROUTE_ORDER[prevIndex]) as never);
       }
     });
 
