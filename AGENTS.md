@@ -85,4 +85,5 @@ Stop and report instead of guessing when:
 
 - Native and web are supported surfaces.
 - Web static export remains the CI smoke/build path for browser support.
+- GitHub protection for `main` should require pull requests plus the `check`, `smoke`, and `smoke-web` status checks before merge.
 - Update `README.md`, `docs/environment.md`, and this file together when the repo contract changes.

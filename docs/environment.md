@@ -18,6 +18,12 @@ These commands should work without credentials:
 - `npm run smoke`
 - `npm run smoke:web`
 
+GitHub branch protection for `main` should require the CI checks that execute these same contract commands:
+
+- `check`
+- `smoke`
+- `smoke-web`
+
 ## Credential-Gated Commands
 
 These commands depend on Expo or EAS credentials and are not part of the local-safe verify contract:

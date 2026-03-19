@@ -38,11 +38,18 @@ Run these from the repo root:
 - `npm run smoke`: static export sanity build
 - `npm run smoke:web`: interactive browser sanity using Playwright
 
+GitHub protection for `main` should require pull requests, one approval, and these three CI checks before merge:
+
+- `check`
+- `smoke`
+- `smoke-web`
+
 ## Environment Contract
 
 No environment variables are required for the local-safe development and verify path today.
 
 - See `docs/environment.md` for the current env and secrets policy.
+- See `docs/github-rulesets.md` for the matching GitHub protection baseline.
 - See `.env.example` for the placeholder env contract.
 - EAS build commands are credential-gated and are not part of the local-safe verify path.
 
