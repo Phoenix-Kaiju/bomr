@@ -9,8 +9,8 @@ import {
   Vibration,
   View,
 } from 'react-native';
+import { setAudioModeAsync, type AudioPlayer, useAudioPlayer } from 'expo-audio';
 import { Swipeable } from 'react-native-gesture-handler';
-import { Audio, type AVPlaybackSource } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import * as Speech from 'expo-speech';
 
@@ -91,6 +91,9 @@ const TIMER_DEFAULTS = {
   FOR_TIME: { targetSec: 10 * 60 },
 } as const;
 
+const BEEP_SOURCE = require('@/assets/sounds/beep.wav');
+const DONE_SOURCE = require('@/assets/sounds/done.wav');
+
 type TimerSettings = {
   amrapSec: number;
   emomSec: number;
@@ -123,6 +126,8 @@ export default function BomScreen() {
   const { settings } = useAppSettings();
   const palette = getThemePalette(settings.themePreset);
   const accent = palette.tint;
+  const beepPlayer = useAudioPlayer(BEEP_SOURCE);
+  const donePlayer = useAudioPlayer(DONE_SOURCE);
 
   const [mode, setMode] = useState<BomMode>('closed');
   const [query, setQuery] = useState('');
@@ -159,8 +164,6 @@ export default function BomScreen() {
       ['45', 4],
     ]),
   });
-  const beepSoundRef = useRef<Audio.Sound | null>(null);
-  const doneSoundRef = useRef<Audio.Sound | null>(null);
   const preStartIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const allEquipment = useMemo(() => {
@@ -241,39 +244,34 @@ export default function BomScreen() {
   }, [dirty, owned, weightSelections, customEquipment]);
 
   useEffect(() => {
-    let mounted = true;
     (async () => {
       try {
-        await Audio.setAudioModeAsync({
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: false,
-          shouldDuckAndroid: true,
-          playThroughEarpieceAndroid: false,
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          interruptionMode: 'duckOthers',
+          shouldPlayInBackground: false,
+          shouldRouteThroughEarpiece: false,
+          allowsRecording: false,
         });
-
-        const beepSource: AVPlaybackSource = require('@/assets/sounds/beep.wav');
-        const doneSource: AVPlaybackSource = require('@/assets/sounds/done.wav');
-
-        const { sound: beep } = await Audio.Sound.createAsync(beepSource, { volume: 0.85 });
-        const { sound: done } = await Audio.Sound.createAsync(doneSource, { volume: 1 });
-        if (!mounted) {
-          await beep.unloadAsync();
-          await done.unloadAsync();
-          return;
-        }
-        beepSoundRef.current = beep;
-        doneSoundRef.current = done;
       } catch {
         // Keep timer functional even if audio fails to initialize.
       }
     })();
-
-    return () => {
-      mounted = false;
-      beepSoundRef.current?.unloadAsync().catch(() => undefined);
-      doneSoundRef.current?.unloadAsync().catch(() => undefined);
-    };
   }, []);
+
+  useEffect(() => {
+    beepPlayer.volume = 0.85;
+    donePlayer.volume = 1;
+  }, [beepPlayer, donePlayer]);
+
+  const playCue = async (player: AudioPlayer) => {
+    try {
+      await player.seekTo(0);
+      player.play();
+    } catch {
+      // Ignore playback errors.
+    }
+  };
 
   useEffect(() => {
     if (!timerRunning) {
@@ -372,16 +370,7 @@ export default function BomScreen() {
       Vibration.vibrate(70);
     }
     if (settings.soundEnabled && settings.voiceCueStyle !== 'SILENT') {
-      doneSoundRef.current
-        ?.replayAsync()
-        .catch(async () => {
-          try {
-            await doneSoundRef.current?.setPositionAsync(0);
-            await doneSoundRef.current?.playAsync();
-          } catch {
-            // Ignore playback errors.
-          }
-        });
+      void playCue(donePlayer);
     }
     if (settings.voiceCueStyle === 'VOICE_BEEP') {
       const enabled =
@@ -397,6 +386,7 @@ export default function BomScreen() {
     timerRunning,
     timerModel,
     timerMode,
+    donePlayer,
     settings.autoResetOnFinish,
     settings.hapticsEnabled,
     settings.vibrationEnabled,
@@ -432,16 +422,7 @@ export default function BomScreen() {
         Vibration.vibrate(strong ? 40 : 20);
       }
       if (settings.soundEnabled) {
-        beepSoundRef.current
-          ?.replayAsync()
-          .catch(async () => {
-            try {
-              await beepSoundRef.current?.setPositionAsync(0);
-              await beepSoundRef.current?.playAsync();
-            } catch {
-              // Ignore playback errors.
-            }
-          });
+        void playCue(beepPlayer);
       }
     };
 
@@ -500,6 +481,7 @@ export default function BomScreen() {
     timerMode,
     effectiveElapsedMs,
     timerSettings,
+    beepPlayer,
     settings.hapticsEnabled,
     settings.vibrationEnabled,
     settings.soundEnabled,
@@ -580,16 +562,7 @@ export default function BomScreen() {
         Vibration.vibrate(20);
       }
       if (settings.soundEnabled) {
-        beepSoundRef.current
-          ?.replayAsync()
-          .catch(async () => {
-            try {
-              await beepSoundRef.current?.setPositionAsync(0);
-              await beepSoundRef.current?.playAsync();
-            } catch {
-              // Ignore playback errors.
-            }
-          });
+        void playCue(beepPlayer);
       }
     };
 

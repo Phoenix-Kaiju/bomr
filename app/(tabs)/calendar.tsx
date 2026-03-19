@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 
 import { BrandBackground } from '@/components/brand-background';
+import { getTabHref } from '@/constants/navigation';
 import { createShadowStyle } from '@/constants/shadows';
 import { Fonts, getThemePalette } from '@/constants/theme';
 import { useAppSettings } from '@/data/app-settings';
@@ -242,13 +243,13 @@ export default function CalendarScreen() {
               </Text>
               <View style={styles.emptyActionRow}>
                 <Pressable
-                  onPress={() => router.navigate('/(tabs)/bom')}
+                  onPress={() => router.navigate(getTabHref('bom'))}
                   style={[styles.emptyActionButton, { backgroundColor: palette.tint }]}
                 >
                   <Text style={[styles.emptyActionText, { color: '#0B0D10' }]}>Open BOM</Text>
                 </Pressable>
                 <Pressable
-                  onPress={() => router.navigate('/(tabs)/build')}
+                  onPress={() => router.navigate(getTabHref('build'))}
                   style={[
                     styles.emptyActionButton,
                     {

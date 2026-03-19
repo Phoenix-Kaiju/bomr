@@ -67,8 +67,9 @@ export default function SettingsScreen() {
         await resetSettings();
       }
       Alert.alert('Import complete', 'Local data was restored from backup.');
-    } catch {
-      Alert.alert('Import failed', 'Backup JSON is invalid.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Backup JSON is invalid.';
+      Alert.alert('Import failed', message);
     }
   };
 

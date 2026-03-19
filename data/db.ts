@@ -12,6 +12,7 @@ import type {
 } from '@/data/types';
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
+let dbInitPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
 const REST_TEMPLATE = {
   kind: 'rest' as const,
@@ -187,9 +188,13 @@ async function runMigrations(db: SQLite.SQLiteDatabase) {
 }
 
 async function getDb() {
-  if (!dbInstance) {
-    dbInstance = await SQLite.openDatabaseAsync('bomr.db');
-    await dbInstance.execAsync(`
+  if (dbInstance) {
+    return dbInstance;
+  }
+  if (!dbInitPromise) {
+    dbInitPromise = (async () => {
+      const db = await SQLite.openDatabaseAsync('bomr.db');
+      await db.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS app_state (
         key TEXT PRIMARY KEY NOT NULL,
@@ -238,9 +243,15 @@ async function getDb() {
         FOREIGN KEY (plan_day_id) REFERENCES plan_days(id)
       );
     `);
-    await runMigrations(dbInstance);
+      await runMigrations(db);
+      dbInstance = db;
+      return db;
+    })().catch((error) => {
+      dbInitPromise = null;
+      throw error;
+    });
   }
-  return dbInstance;
+  return dbInitPromise;
 }
 
 async function logWorkoutEvent(
