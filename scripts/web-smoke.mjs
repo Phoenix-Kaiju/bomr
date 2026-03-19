@@ -44,13 +44,24 @@ async function stopServer(serverProcess) {
   if (serverProcess.exitCode !== null) {
     return;
   }
-  serverProcess.kill('SIGINT');
+
+  if (process.platform === 'win32') {
+    serverProcess.kill('SIGINT');
+  } else if (serverProcess.pid) {
+    process.kill(-serverProcess.pid, 'SIGINT');
+  }
+
   await Promise.race([
     new Promise((resolve) => serverProcess.once('exit', resolve)),
     delay(5_000),
   ]);
+
   if (serverProcess.exitCode === null) {
-    serverProcess.kill('SIGKILL');
+    if (process.platform === 'win32') {
+      serverProcess.kill('SIGKILL');
+    } else if (serverProcess.pid) {
+      process.kill(-serverProcess.pid, 'SIGKILL');
+    }
   }
 }
 
@@ -74,6 +85,7 @@ const serverProcess = spawn(
       CI: '1',
       BROWSER: 'none',
     },
+    detached: process.platform !== 'win32',
     stdio: ['ignore', 'pipe', 'pipe'],
   }
 );
