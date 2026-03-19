@@ -44,6 +44,8 @@ GitHub protection for `main` should require pull requests, one approval, and the
 - `smoke`
 - `smoke-web`
 
+See [docs/repo-hygiene.md](/Users/jsawyer/Documents/testing/bomr/docs/repo-hygiene.md) for the expected branch, PR, and post-merge workflow.
+
 ## Environment Contract
 
 No environment variables are required for the local-safe development and verify path today.
