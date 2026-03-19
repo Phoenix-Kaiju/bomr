@@ -1,0 +1,21 @@
+# Default owner for the repo contract and any paths not listed below.
+* @Phoenix-Kaiju
+
+# App flow
+/app/ @Phoenix-Kaiju
+
+# UI system
+/components/ @Phoenix-Kaiju
+/constants/ @Phoenix-Kaiju
+
+# Data flow
+/data/ @Phoenix-Kaiju
+/hooks/ @Phoenix-Kaiju
+
+# Harness
+/.github/ @Phoenix-Kaiju
+/docs/ @Phoenix-Kaiju
+/scripts/ @Phoenix-Kaiju
+/AGENTS.md @Phoenix-Kaiju
+/README.md @Phoenix-Kaiju
+/package.json @Phoenix-Kaiju

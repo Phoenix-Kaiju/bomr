@@ -46,9 +46,9 @@ async function stopServer(serverProcess) {
   }
 
   if (process.platform === 'win32') {
-    serverProcess.kill('SIGINT');
+    safeKill(() => serverProcess.kill('SIGINT'));
   } else if (serverProcess.pid) {
-    process.kill(-serverProcess.pid, 'SIGINT');
+    safeKill(() => process.kill(-serverProcess.pid, 'SIGINT'));
   }
 
   await Promise.race([
@@ -58,9 +58,19 @@ async function stopServer(serverProcess) {
 
   if (serverProcess.exitCode === null) {
     if (process.platform === 'win32') {
-      serverProcess.kill('SIGKILL');
+      safeKill(() => serverProcess.kill('SIGKILL'));
     } else if (serverProcess.pid) {
-      process.kill(-serverProcess.pid, 'SIGKILL');
+      safeKill(() => process.kill(-serverProcess.pid, 'SIGKILL'));
+    }
+  }
+}
+
+function safeKill(killFn) {
+  try {
+    killFn();
+  } catch (error) {
+    if (!(error && typeof error === 'object' && 'code' in error && error.code === 'ESRCH')) {
+      throw error;
     }
   }
 }
